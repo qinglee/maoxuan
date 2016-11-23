@@ -6,18 +6,25 @@
 \cs_set_eq:NN \pdfmdfivesum \mdfivesum
 
 \DeclareOption * { \PassOptionsToClass { \CurrentOption } { ctexbook } }
-\PassOptionsToClass { openany , linespread = 1.25 , fontset = none } { ctexbook }
+\PassOptionsToClass { openany , linespread = 4/3 , fontset = none } { ctexbook }
 \ProcessOptions \scan_stop:
-\LoadClass { ctexbook } [ 2016/01/01 ]
+\LoadClass { ctexbook } [ 2016/10/25 ]
 
 \raggedbottom
 \RequirePackage { geometry }
+\skip_set:Nn \topskip { 12pt }
 \geometry
   {
-    papersize = { 130mm , 184mm } , textwidth = 95mm , lines = 25 ,
-    bindingoffset = 5mm , hcentering = true , top = 25mm ,
-    headheight = 10mm , headsep = 6mm , foot = 5mm ,
+    papersize     = { 130mm , 184mm } ,
+    lines         = 25 ,
+    hmargin       = 15mm ,
+    bindingoffset =  5mm ,
+    headheight    = 10pt ,
+    headsep       = \baselineskip ,
+    includehead   = true ,
+    vcentering    = true
   }
+\PassOptionsToPackage { mainaux } { rerunfilecheck }
 \RequirePackage { pifont }
 \RequirePackage { booktabs , enumitem , titleps }
 \RequirePackage { hyperref }
@@ -192,60 +199,15 @@
       {
         \c_backslash_str maoxuan@article@endpage
           { \l_maoxuan_current_article_str }
-          { \exp_not:N \thepage }
+          { \thepage }
       }
-    \if@filesw \maoxuan_set_end_page_mark: \fi:
   }
 \cs_new_eq:NN \mxendarticle \maoxuan_at_end_article:
-\cs_new_protected:Npn \maoxuan_set_end_page_mark:
-  {
-    \etex_marks:D \g_maoxuan_end_page_mark
-      { \maoxuan_save_end_page:n { \l_maoxuan_current_article_str } }
-    \etex_marks:D \g_maoxuan_end_page_mark { }
-  }
-\cs_new_protected:Npn \maoxuan_get_end_page_mark:
-  { \etex_firstmarks:D \g_maoxuan_end_page_mark }
-\newmarks \g_maoxuan_end_page_mark
-\cs_new_protected:Npn \maoxuan_save_end_page:n #1
-  { \use:x { \maoxuan_save_end_page:nn {#1} { \thepage } } }
 \cs_new_protected:Npn \maoxuan_save_end_page:nn
   { \prop_gput:Nnn \g_maoxuan_article_end_page_prop }
 \cs_new_eq:NN \maoxuan@article@endpage \maoxuan_save_end_page:nn
 \prop_new:N \g_maoxuan_article_end_page_prop
-\AtBeginShipout { \maoxuan_get_end_page_mark: }
 \setcounter { secnumdepth } { -5 }
-\cs_set_eq:NN \@chapter \Hy@org@chapter
-\ctex_patch_cmd_all:NnnnTF \@chapter { }
-  { \addcontentsline { toc } { chapter } }
-  { \maoxuan@chapterhook }
-  { }
-  { \msg_error:nnx { ctex } { patch-failure } { \c_backslash_str @chapter } }
-\cs_new_protected:Npn \maoxuan@chapterhook #1
-  {
-    \Hy@MakeCurrentHref { \l_maoxuan_current_article_str }
-    \maoxuan_hyper_anchor:n { \@currentHref }
-    \addcontentsline { toc } { chapter } {#1}
-    \maoxuan_add_article_toc:
-  }
-\cs_new_protected:Npn \maoxuan_add_article_toc:
-  {
-    \protected@write \@auxout { }
-      {
-        \c_backslash_str maoxuan@article@toc
-          { \l_maoxuan_current_article_str }
-          { \g_maoxuan_date_tl }
-      }
-  }
-\cs_new_protected:Npn \maoxuan@article@toc #1#2
-  {
-    \cs_if_free:NF \tf@toc
-      {
-        \prop_get:NnNF \g_maoxuan_article_end_page_prop {#1} \l_tmpa_tl
-          { \tl_clear:N \l_tmpa_tl }
-        \iow_now:Nx \tf@toc
-          { { \exp_not:n {#2} } { \exp_not:o { \l_tmpa_tl } } }
-      }
-  }
 \ctexset
   {
     part =
@@ -259,6 +221,8 @@
       {
         pagestyle  = chapter ,
         format     = \bfseries \centering \LARGE ,
+        tocline    = \maoxuan_article_toc:nn { \CTEXnumberline {#1} #2 }
+                                             { \g_maoxuan_date_tl } ,
         aftertitle = \maoxuan_make_thanks: \par
                      \maoxuan_make_date:n { \normalsize } \par ,
         beforeskip = 20pt ,
@@ -266,31 +230,43 @@
       } ,
     section =
       {
-        format      = \bfseries \centering \Large ,
-        titleformat = \maoxuan_strut:n { \baselineskip } ,
+        hang        = false ,
+        format      = \maoxuan_topskip_kludge:
+                      \bfseries \centering \Large ,
         aftertitle  = \par \maoxuan_make_date:n { \small } \par ,
         beforeskip  = \bigskipamount ,
         afterskip   = \bigskipamount ,
       } ,
     subsection =
       {
-        format      = \bfseries \centering \large ,
-        titleformat = \maoxuan_strut:n { \baselineskip } ,
+        hang        = false ,
+        format      = \maoxuan_topskip_kludge:
+                      \bfseries \centering \large ,
         beforeskip  = \medskipamount ,
         afterskip   = \medskipamount ,
       } ,
     subsubsection =
       {
-        format      = \bfseries \centering \normalsize ,
-        titleformat = \maoxuan_strut:n { \baselineskip } ,
+        hang        = false ,
+        format      = \maoxuan_topskip_kludge:
+                      \bfseries \centering \normalsize ,
         beforeskip  = \smallskipamount ,
         afterskip   = \smallskipamount ,
       } ,
   }
-\cs_new_protected:Npn \maoxuan_strut:n #1
+\cs_new:Npn \maoxuan_article_toc:nn #1#2
+  { {#1} {#2} }
+\pdfstringdefDisableCommands
+  { \cs_set_eq:NN \maoxuan_article_toc:nn \use_i:nn }
+\cs_new_protected_nopar:Npn \maoxuan_topskip_kludge:
   {
-    \tex_vrule:D width \c_zero_dim depth \c_zero_dim
-      height \dim_eval:n {#1} \scan_stop:
+    \skip_set:Nn \l_tmpa_skip
+      { \l_maoxuan_headsep_dim - \tex_lastskip:D }
+    \dim_compare:nNnTF { \l_tmpa_skip } > \c_zero_dim
+      { \skip_set_eq:NN \l_tmpa_skip \tex_topskip:D }
+      { \skip_add:Nn \l_tmpa_skip { \tex_topskip:D } }
+    \skip_vertical:N \l_tmpa_skip
+    \@vspacer { -\l_tmpa_skip }
   }
 \cs_new_protected_nopar:Npn \maoxuan_article_head_rule:
   { \box_use:N \l_maoxuan_article_head_rule_box }
@@ -309,6 +285,12 @@
   {
     \tex_kern:D 5pt \scan_stop:
     \tex_hrule:D width \textwidth depth .5pt height \c_zero_dim \scan_stop:
+  }
+\dim_new:N \l_maoxuan_headsep_dim
+\dim_set:Nn \l_maoxuan_headsep_dim
+  {
+    \headsep - \box_ht:N \l_maoxuan_main_head_rule_box
+             - \box_dp:N \l_maoxuan_main_head_rule_box
   }
 \newpagestyle { chapter } [ \small ]
   {
@@ -337,7 +319,7 @@
     \maoxuan_input_toc_aux:nn
       { \Roman { page } }
       {
-        \maoxuan_toc_title:n { { \ziju { .5 } 总目录 } }
+        \maoxuan_toc_title:n { 总目录 }
         \maoxuan_input_toc:
       }
   }
@@ -346,7 +328,7 @@
     \maoxuan_input_toc_aux:nn
       { \Roman { volume } . \Roman { page } }
       {
-        \maoxuan_toc_title:n { { \ziju { .5 } \contentsname } }
+        \maoxuan_toc_title:n { 第 \chinese { volume } 卷 \contentsname }
         \prop_get:NnNT \g_maoxuan_toc_prop {#1} \l_tmpa_tl
           { \tl_use:N \l_tmpa_tl }
       }
@@ -372,6 +354,9 @@
       \iow_new:N \g_maoxuan_toc_iow
       \iow_open:Nn \g_maoxuan_toc_iow { \c_sys_jobname_str .toc }
       \cs_new_eq:NN \tf@toc \g_maoxuan_toc_iow
+      \RerunFileCheck { \c_sys_jobname_str .toc }
+        { \iow_close:N \g_maoxuan_toc_iow }
+        { }
     \fi:
     \@nobreakfalse
   }
@@ -399,8 +384,12 @@
     \pagenumbering { arabic }
     \setcounter { page } { \l_maoxuan_page_int }
   }
-\cs_new_protected:Npn \maoxuan_toc_title:n #1
-  { \chapter * { #1 \@mkboth {#1} {#1} } }
+\cs_new_protected:Npn \maoxuan_toc_title:n
+  {
+    \bookmarksetup { startatroot }
+    \cs_set_eq:NN \addtocontents \use_none:nn
+    \chapter
+  }
 \cs_new_eq:NN \maoxuan@saved@contentsline \contentsline
 \RenewDocumentCommand \contentsline { m }
   {
@@ -417,9 +406,10 @@
   {
     \addpenalty { -\@highpenalty }
     \addvspace { \bigskipamount }
+    \maoxuan_topskip_kludge:
     \group_begin:
       \centering \bfseries \large
-      \maoxuan_hyper_link:nn {#3} { \maoxuan_strut:n { \baselineskip } #1 } \par
+      \maoxuan_hyper_link:nn {#3} {#1} \par
     \group_end:
     \@nobreaktrue \everypar { \@nobreakfalse \everypar { } }
     \nobreak \bigskip
@@ -427,10 +417,12 @@
 \cs_new_protected:Npn \maoxuan@toc@chapter
   {
     \int_compare:nNnTF { \value { tocdepth } } > \c_minus_one
-      { \maoxuan_toc_chapter:nnnnn }
-      { \use_none:nnnnn }
+      { \maoxuan_toc_chapter:nnn }
+      { \use_none:nnn }
   }
-\cs_new_protected:Npn \maoxuan_toc_chapter:nnnnn #1#2#3#4#5
+\cs_new_protected:Npn \maoxuan_toc_chapter:nnn #1
+  { \maoxuan_toc_chapter:nnnn #1 }
+\cs_new_protected:Npn \maoxuan_toc_chapter:nnnn #1#2#3#4
   {
     \addpenalty { -\@highpenalty }
     \addvspace { \smallskipamount }
@@ -441,12 +433,12 @@
       \int_set_eq:NN \tex_hangafter:D \c_one
       \int_set_eq:NN \tex_interlinepenalty:D \c_ten_thousand
       \tex_noindent:D
-      \maoxuan_hyper_link:nn {#3}
-        { #1 \tl_if_empty:nF {#4} { { \footnotesize （ #4 ） } } }
-      \tex_penalty:D 0 \null \maoxuan_cdot_fill:
-      \tl_if_empty:nTF {#5}
-        { \maoxuan_hyper_page:n {#2} }
-        { \maoxuan_toc_page_range:nn {#2} {#5} }
+      \maoxuan_hyper_link:nn {#4}
+        { #1 \tl_if_empty:nF {#2} { { \footnotesize （ #2 ） } } }
+      \tex_penalty:D \c_zero \null \maoxuan_cdot_fill:
+      \prop_get:NnNTF \g_maoxuan_article_end_page_prop {#4} \l_tmpa_tl
+        { \exp_args:No \maoxuan_toc_page_range:nn { \l_tmpa_tl } {#3} }
+        { \maoxuan_hyper_page:n {#3} }
       \par \tex_penalty:D \@highpenalty
     \group_end:
   }
@@ -457,8 +449,8 @@
       {
         \hbox:n
           {
-            \maoxuan_hyper_page:n {#1} —
-            \maoxuan_hyper_page:n {#2}
+            \maoxuan_hyper_page:n {#2} —
+            \maoxuan_hyper_page:n {#1}
           }
       }
   }
@@ -551,6 +543,13 @@
     \exp_args:No \chapter { \l_maoxuan_title_tl }
     \tl_clear:N \l_maoxuan_title_tl
     \tl_clear:N \l_maoxuan_thanks_tl
+  }
+\cs_set_protected:Npn \CTEX@makeanchor@chapter #1
+  {
+    \tl_if_empty:NTF \l_maoxuan_title_tl
+      { \Hy@MakeCurrentHrefAuto {#1} }
+      { \Hy@MakeCurrentHref { \l_maoxuan_current_article_str } }
+    \maoxuan_hyper_anchor:n { \@currentHref }
   }
 \NewDocumentCommand \mxname { +m } { \tex_noindent:D #1 }
 \NewDocumentCommand \mxsay { +m } { { \bfseries #1 } }
@@ -798,8 +797,8 @@
       {
         section =
           {
-            format      = \large \bfseries ,
-            titleformat = \maoxuan_strut:n { \baselineskip } ,
+            format      = \maoxuan_topskip_kludge:
+                          \large \bfseries ,
             indent      = \l_maoxuan_notetitle_indent_dim ,
             beforeskip  = 15pt minus 10pt ,
             afterskip   = 15pt minus 10pt ,
