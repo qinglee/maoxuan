@@ -159,14 +159,20 @@
 \cs_new_protected:Npn \maoxuan_include:nn #1#2
   {
     \tl_clear:N \l_tmpa_tl
-    \int_set:Nn \l_tmpa_int {#2}
-    \int_set:Nn \l_tmpb_int { \int_min:nn { \l_tmpa_int } { \c_nine } }
-    \int_step_inline:nnnn {#1} { \c_one } { \l_tmpb_int }
+    \int_set:Nn \l_tmpa_int {#1}
+    \int_set:Nn \l_tmpb_int {#2}
+    \int_step_inline:nnnn
+      { \l_tmpa_int }
+      { \c_one }
+      { \int_min:nn { \l_tmpb_int } { \c_nine } }
       {
         \tl_put_right:Nx \l_tmpa_tl
           { \maoxuan_input_article:n { \l_maoxuan_vol_prefix_tl 0 ##1 } }
       }
-    \int_step_inline:nnnn { \c_ten } { \c_one } { \l_tmpa_int }
+    \int_step_inline:nnnn
+      { \int_max:nn { \l_tmpa_int } { \c_ten } }
+      { \c_one }
+      { \l_tmpb_int }
       {
         \tl_put_right:Nx \l_tmpa_tl
           { \maoxuan_input_article:n { \l_maoxuan_vol_prefix_tl ##1 } }
@@ -352,11 +358,11 @@
       }
     \if@filesw
       \iow_new:N \g_maoxuan_toc_iow
-      \iow_open:Nn \g_maoxuan_toc_iow { \c_sys_jobname_str .toc }
-      \cs_new_eq:NN \tf@toc \g_maoxuan_toc_iow
       \RerunFileCheck { \c_sys_jobname_str .toc }
         { \iow_close:N \g_maoxuan_toc_iow }
         { }
+      \iow_open:Nn \g_maoxuan_toc_iow { \c_sys_jobname_str .toc }
+      \cs_new_eq:NN \tf@toc \g_maoxuan_toc_iow
     \fi:
     \@nobreakfalse
   }
