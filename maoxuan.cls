@@ -63,7 +63,8 @@
     AutoFakeBold            = false ,
     AutoFakeSlant           = false ,
     CheckFullRight          = true ,
-    NewLineCS+              = \mxendarticle \item \mnitem ,
+    NewLineCS+              = \mxendarticle \item \mnitem
+                              \maoxuan_endline_mark: ,
     NoBreakCS+              = \mnote ,
     PunctStyle              = kaiming ,
     KaiMingPunct+           = ：； ,
@@ -225,20 +226,22 @@
       } ,
     chapter =
       {
-        pagestyle  = chapter ,
-        format     = \bfseries \centering \LARGE ,
-        tocline    = \maoxuan_article_toc:nn { \CTEXnumberline {#1} #2 }
-                                             { \g_maoxuan_date_tl } ,
-        aftertitle = \maoxuan_make_thanks: \par
-                     \maoxuan_make_date:n { \normalsize } \par ,
-        beforeskip = 20pt ,
-        afterskip  = 30pt minus 16pt ,
+        pagestyle   = chapter ,
+        format      = \bfseries \centering \LARGE ,
+        titleformat = \maoxuan_endline_mark:n ,
+        tocline     = \maoxuan_article_toc:nn { \CTEXnumberline {#1} #2 }
+                                              { \g_maoxuan_date_tl } ,
+        aftertitle  = \maoxuan_make_thanks: \par
+                      \maoxuan_make_date:n { \normalsize } \par ,
+        beforeskip  = 20pt ,
+        afterskip   = 30pt minus 16pt ,
       } ,
     section =
       {
         hang        = false ,
         format      = \maoxuan_topskip_kludge:
                       \bfseries \centering \Large ,
+        titleformat = \maoxuan_endline_mark:n ,
         aftertitle  = \par \maoxuan_make_date:n { \small } \par ,
         beforeskip  = \bigskipamount ,
         afterskip   = \bigskipamount ,
@@ -260,6 +263,11 @@
         afterskip   = \smallskipamount ,
       } ,
   }
+\cs_new_protected:Npn \maoxuan_endline_mark:n #1
+  { #1 \maoxuan_endline_mark: }
+\cs_new_protected_nopar:Npn \maoxuan_endline_mark:
+  { \maoxuan_endline_mark_aux: }
+\cs_new_eq:NN\maoxuan_endline_mark_aux: \prg_do_nothing:
 \cs_new:Npn \maoxuan_article_toc:nn #1#2
   { {#1} {#2} }
 \pdfstringdefDisableCommands
