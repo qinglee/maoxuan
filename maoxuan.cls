@@ -5,6 +5,10 @@
 
 \cs_set_eq:NN \pdfmdfivesum \mdfivesum
 
+\DeclareOption { source-han }
+  { \bool_gset_true:N \g_maoxuan_source_han_bool }
+\bool_new:N \g_maoxuan_source_han_bool
+
 \DeclareOption * { \PassOptionsToClass { \CurrentOption } { ctexbook } }
 \PassOptionsToClass { openany , linespread = 4/3 , fontset = none } { ctexbook }
 \ProcessOptions \scan_stop:
@@ -69,19 +73,31 @@
     PunctStyle              = kaiming ,
     KaiMingPunct+           = ：； ,
   }
-\setmainfont{Linux ~ Biolinum ~ O}
-\setCJKmainfont[
-       BoldFont=FZYouH_511M,
-     ItalicFont=FZNewKai_GB18030-Z03]{FZNewShuSong_GB18030-Z10}
-\setCJKsansfont[BoldFont=FZYouH_511M]{FZYouH_508R}
-\setCJKmonofont{FZFangSong-Z02}
-\newCJKfontfamily\songti[BoldFont=FZYaSong-EB-GBK]{FZNewShuSong_GB18030-Z10}
-\newCJKfontfamily\kaishu      {FZNewKai_GB18030-Z03}
-\newCJKfontfamily\heiti       {FZHei-B01}
-\newCJKfontfamily\fangsong    {FZFangSong-Z02}
-\newCJKfontfamily\lishu       {FZLiShu-S01}
-\newCJKfontfamily\yuanti      {FZZhunYuan-M02}
-\newCJKfontfamily\mingchao    {Hiragino ~ Mincho ~ ProN}
+\bool_if:NTF \g_maoxuan_source_han_bool
+  {
+    \setmainfont { Source ~ Serif ~ Pro }
+    \setsansfont { Source ~ Sans ~ Pro }
+    \setmonofont { Source ~ Code ~ Pro }
+    \setCJKmainfont
+      [BoldFont=Source ~ Han ~ Sans ~ CN ~ Medium]{Source ~ Han ~ Serif ~ CN}
+    \setCJKsansfont{Source ~ Han ~ Sans ~ CN}
+    \newCJKfontfamily\songti[BoldFont=* ~ Heavy]{Source ~ Han ~ Serif ~ CN}
+    \newCJKfontfamily\mingchao{Source ~ Han ~ Serif ~ JP}
+    \NewDocumentCommand \kaishu { } { \normalfont }
+    \cs_new_eq:NN \fangsong \kaishu
+  }
+  {
+    \setmainfont { Linux ~ Biolinum ~ O }
+    \setCJKmainfont[
+           BoldFont=FZYouH_511M,
+         ItalicFont=FZNewKai_GB18030-Z03]{FZNewShuSong_GB18030-Z10}
+    \setCJKsansfont[BoldFont=FZYouH_511M]{FZYouH_508R}
+    \setCJKmonofont{FZFangSong-Z02}
+    \newCJKfontfamily\songti[BoldFont=FZYaSong-EB-GBK]{FZNewShuSong_GB18030-Z10}
+    \newCJKfontfamily\kaishu      {FZNewKai_GB18030-Z03}
+    \newCJKfontfamily\fangsong    {FZFangSong-Z02}
+    \newCJKfontfamily\mingchao    {Hiragino ~ Mincho ~ ProN}
+  }
 \ctex_patch_cmd:Nnn \cleardoublepage
   { \newpage }
   { \thispagestyle { empty } \newpage }
