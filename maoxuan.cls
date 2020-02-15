@@ -1,9 +1,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2016/01/01]
-\RequirePackage{expl3}[2016/01/01]
-\ProvidesExplClass{maoxuan}{2016/01/01}{v0}{Selected Works of Mao Tse-Tung}
-
-\cs_set_eq:NN \pdfmdfivesum \mdfivesum
+\RequirePackage{expl3}[2020/02/14]
+\ProvidesExplClass{maoxuan}{2020/02/14}{0}{Selected Works of Mao Tse-Tung}
 
 \DeclareOption { source-han }
   { \bool_gset_true:N \g_maoxuan_source_han_bool }
@@ -29,6 +27,7 @@
     vcentering    = true
   }
 \PassOptionsToPackage { mainaux } { rerunfilecheck }
+\RequirePackage { graphicx }
 \RequirePackage { pifont }
 \RequirePackage { booktabs , enumitem , titleps }
 \RequirePackage { hyperref }
@@ -79,22 +78,22 @@
     \setsansfont { Source ~ Sans ~ Pro }
     \setmonofont { Source ~ Code ~ Pro }
     \setCJKmainfont
-      [BoldFont=Source ~ Han ~ Sans ~ CN ~ Medium]{Source ~ Han ~ Serif ~ CN}
-    \setCJKsansfont{Source ~ Han ~ Sans ~ CN}
-    \newCJKfontfamily\songti[BoldFont=* ~ Heavy]{Source ~ Han ~ Serif ~ CN}
-    \newCJKfontfamily\mingchao{Source ~ Han ~ Serif ~ JP}
+      [BoldFont=Source ~ Han ~ Sans ~ SC ~ Medium]{Source ~ Han ~ Serif ~ SC}
+    \setCJKsansfont{Source ~ Han ~ Sans ~ SC}
+    \newCJKfontfamily\songti[BoldFont=* ~ Heavy]{Source ~ Han ~ Serif ~ SC}
+    \newCJKfontfamily\mingchao{Source ~ Han ~ Serif}
     \NewDocumentCommand \kaishu { } { \normalfont }
     \cs_new_eq:NN \fangsong \kaishu
   }
   {
     \setmainfont { Linux ~ Biolinum ~ O }
     \setCJKmainfont[
-           BoldFont=FZYouH_511M,
-         ItalicFont=FZNewKai_GB18030-Z03]{FZNewShuSong_GB18030-Z10}
-    \setCJKsansfont[BoldFont=FZYouH_511M]{FZYouH_508R}
+           BoldFont=FZYouH_GBK ~ 511M,
+         ItalicFont=FZNewKai-Z03]{FZNewShuSong-Z10}
+    \setCJKsansfont[BoldFont=FZYouH_GBK ~ 511M]{FZYouH_GBK ~ 508R}
     \setCJKmonofont{FZFangSong-Z02}
-    \newCJKfontfamily\songti[BoldFont=FZYaSong-EB-GBK]{FZNewShuSong_GB18030-Z10}
-    \newCJKfontfamily\kaishu      {FZNewKai_GB18030-Z03}
+    \newCJKfontfamily\songti[BoldFont=FZYaSong-EB-GBK]{FZNewShuSong-Z10}
+    \newCJKfontfamily\kaishu      {FZNewKai-Z03}
     \newCJKfontfamily\fangsong    {FZFangSong-Z02}
     \newCJKfontfamily\mingchao    {Hiragino ~ Mincho ~ ProN}
   }
@@ -169,7 +168,7 @@
   { \maoxuan_include_aux:nn #1 }
 \cs_new_protected:Npn \maoxuan_include_aux:nn #1#2
   {
-    \IfNoValueTF {#2}
+    \tl_if_novalue:nTF {#2}
       { \maoxuan_include:nn { 1 } {#1} }
       { \maoxuan_include:nn {#1}  {#2} }
   }
@@ -198,18 +197,17 @@
   }
 \cs_new_protected:Npn \maoxuan_input_article:n #1
   {
-    \file_add_path:nN {#1} \l_maoxuan_current_file_tl
-    \quark_if_no_value:NTF \l_maoxuan_current_file_tl
-      {
-        \msg_error:nnx { maoxuan } { file-not-found }
-          { \l_maoxuan_current_file_tl }
-      }
+    \file_get_full_name:nNTF {#1} \l_maoxuan_current_file_tl
       {
         \clearpage
         \@addtofilelist { \l_maoxuan_current_file_tl }
         \tex_input:D \l_maoxuan_current_file_tl \c_space_token
         \maoxuan_at_end_article:
         \clearpage
+      }
+      {
+        \msg_error:nnx { maoxuan } { file-not-found }
+          { \l_maoxuan_current_file_tl }
       }
   }
 \cs_new_eq:NN \mxinput \maoxuan_input_article:n
@@ -250,14 +248,14 @@
         aftertitle  = \maoxuan_make_thanks: \par
                       \maoxuan_make_date:n { \normalsize } \par ,
         beforeskip  = 20pt ,
-        afterskip   = 30pt minus 16pt ,
+        afterskip   = 30pt minus 10pt ,
       } ,
     section =
       {
         hang        = false ,
         format      = \maoxuan_topskip_kludge:
                       \bfseries \centering \Large ,
-        titleformat = \maoxuan_endline_mark:n ,
+        titleformat = \maoxuan_title_hangbox:n ,
         aftertitle  = \par \maoxuan_make_date:n { \small } \par ,
         beforeskip  = \bigskipamount ,
         afterskip   = \bigskipamount ,
@@ -267,6 +265,7 @@
         hang        = false ,
         format      = \maoxuan_topskip_kludge:
                       \bfseries \centering \large ,
+        titleformat = \maoxuan_title_hangbox:n ,
         beforeskip  = \medskipamount ,
         afterskip   = \medskipamount ,
       } ,
@@ -278,6 +277,41 @@
         beforeskip  = \smallskipamount ,
         afterskip   = \smallskipamount ,
       } ,
+  }
+\cs_new_protected:Npn \maoxuan_title_hangbox:n #1
+  { \maoxuan_title_hangbox:w #1 ^^^^3000 ^^^^3000 \q_stop }
+\cs_new_protected:Npn \maoxuan_title_hangbox:w #1 ^^^^3000 #2 ^^^^3000 #3 \q_stop
+  {
+    \tl_if_empty:nTF {#3}
+      { \maoxuan_endline_mark:n {#1} }
+      { \maoxuan_title_hangbox:nn {#1} {#2} }
+  }
+\cs_new_protected:Npn \maoxuan_title_hangbox:nn #1#2
+  {
+    \hbox_set:Nn \l_tmpa_box {#1}
+    \hbox_set:Nn \l_tmpb_box { \maoxuan_endline_mark:n {#2} }
+    \dim_set:Nn \l_tmpa_dim { \linewidth - 2\ccwd }
+    \dim_compare:nNnTF
+      { \box_wd:N \l_tmpa_box + \box_wd:N \l_tmpb_box } > { \l_tmpa_dim }
+      { \maoxuan_make_title_coffin: }
+      {
+        \mode_leave_vertical:
+        \box_use_drop:N \l_tmpa_box \tex_kern:D \ccwd
+        \box_use_drop:N \l_tmpb_box
+      }
+  }
+\cs_new_protected_nopar:Npn \maoxuan_make_title_coffin:
+  {
+    \hcoffin_set:Nn \l_tmpa_coffin { \hbox_unpack_drop:N \l_tmpa_box }
+    \dim_sub:Nn \l_tmpa_dim { \coffin_wd:N \l_tmpa_coffin }
+    \vcoffin_set:Nnn \l_tmpb_coffin
+      { \int_div_truncate:nn { \l_tmpa_dim } { \ccwd } \ccwd }
+      { \@parboxrestore \hbox_unpack_drop:N \l_tmpb_box }
+    \coffin_join:NnnNnnnn
+      \l_tmpa_coffin { H } { r }
+      \l_tmpb_coffin { T } { l } { \ccwd } { \c_zero_dim }
+    \coffin_typeset:Nnnnn \l_tmpa_coffin
+      { H } { l } { \c_zero_dim } { \c_zero_dim }
   }
 \cs_new_protected:Npn \maoxuan_endline_mark:n #1
   { #1 \maoxuan_endline_mark: }
@@ -365,29 +399,28 @@
   }
 \cs_new_protected_nopar:Npn \maoxuan_input_toc:
   {
-    \tl_gclear:N \g_maoxuan_toc_tl
-    \file_if_exist:nT { \c_sys_jobname_str .toc }
+    \file_get:nnNTF
+      { \c_sys_jobname_str .toc }
       {
-        \tl_gset_from_file:Nnn \g_maoxuan_toc_tl
-          {
-            \char_set_catcode_letter:n { 64 }
-            \int_set_eq:NN \tex_endlinechar:D \c_minus_one
-          }
-          { \c_sys_jobname_str .toc }
+        \char_set_catcode_letter:n { 64 }
+        \int_set:Nn \tex_endlinechar:D { -1 }
       }
-    \tl_if_empty:NF \g_maoxuan_toc_tl
+      \l_tmpa_tl
       {
+        \tl_gset_eq:NN \g_maoxuan_toc_tl \l_tmpa_tl
         \tl_use:N \g_maoxuan_toc_tl
         \exp_args:No \maoxuan_save_toc:n { \g_maoxuan_toc_tl }
       }
-    \if@filesw
-      \iow_new:N \g_maoxuan_toc_iow
-      \RerunFileCheck { \c_sys_jobname_str .toc }
-        { \iow_close:N \g_maoxuan_toc_iow }
-        { }
-      \iow_open:Nn \g_maoxuan_toc_iow { \c_sys_jobname_str .toc }
-      \cs_new_eq:NN \tf@toc \g_maoxuan_toc_iow
-    \fi:
+      { \tl_gclear:N \g_maoxuan_toc_tl }
+    \legacy_if:nT { @filesw }
+      {
+        \iow_new:N \g_maoxuan_toc_iow
+        \RerunFileCheck { \c_sys_jobname_str .toc }
+          { \iow_close:N \g_maoxuan_toc_iow }
+          { }
+        \iow_open:Nn \g_maoxuan_toc_iow { \c_sys_jobname_str .toc }
+        \cs_new_eq:NN \tf@toc \g_maoxuan_toc_iow
+      }
     \@nobreakfalse
   }
 \cs_new_protected:Npn \maoxuan_save_toc:n #1
@@ -446,7 +479,7 @@
   }
 \cs_new_protected:Npn \maoxuan@toc@chapter
   {
-    \int_compare:nNnTF { \value { tocdepth } } > \c_minus_one
+    \int_compare:nNnTF { \value { tocdepth } } > { -1 }
       { \maoxuan_toc_chapter:nnn }
       { \use_none:nnn }
   }
@@ -543,7 +576,7 @@
 \cs_new_protected_nopar:Npn \maoxuan_cdot_fill:
   {
     \tex_leaders:D
-      \hbox_to_wd:nn { 8pt } { \tex_hss:D \textcdot \tex_hss:D }
+      \hbox_to_wd:nn { 8pt } { \tex_hss:D \textperiodcentered \tex_hss:D }
       \tex_hfill:D
   }
 \cs_new_protected_nopar:Npn \maoxuan_sanitize:Nnn #1#2#3
@@ -617,7 +650,7 @@
       }
     \box_set_ht:Nn \l_tmpa_box { \c_zero_dim }
     \box_set_wd:Nn \l_tmpa_box { \c_zero_dim }
-    \box_use_clear:N \l_tmpa_box
+    \box_use_drop:N \l_tmpa_box
   }
 \tl_new:N \l_maoxuan_thanks_symbol_tl
 \tl_set:Nn \l_maoxuan_thanks_symbol_tl { \ding { 91 } }
@@ -648,7 +681,7 @@
           \skip_zero:N \tex_splittopskip:D
           \dim_set:Nn \tex_splitmaxdepth:D { \box_dp:N \strutbox }
           \int_set_eq:NN \tex_floatingpenalty:D \@MM
-          \vbox_unpack_clear:N \l_maoxuan_thanks_box
+          \vbox_unpack_drop:N \l_maoxuan_thanks_box
         }
     \group_end:
   }
@@ -780,10 +813,10 @@
     \hbox_set:Nn \l_tmpa_box
       {
         \box_move_up:nn { \ccwd - \box_ht:N \l_tmpa_box }
-          { \box_use_clear:N \l_tmpa_box }
+          { \box_use_drop:N \l_tmpa_box }
       }
     \box_set_ht:Nn \l_tmpa_box { \c_zero_dim }
-    \box_use_clear:N \l_tmpa_box
+    \box_use_drop:N \l_tmpa_box
   }
 \cs_new_protected:Npn \maoxuan_note_format:n #1 { [#1] }
 \NewDocumentCommand \mnitem { +m }
