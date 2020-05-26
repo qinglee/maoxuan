@@ -1,7 +1,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2016/01/01]
 \RequirePackage{expl3}[2020/02/14]
-\ProvidesExplClass{maoxuan}{2020/02/14}{0}{Selected Works of Mao Tse-Tung}
+\ProvidesExplClass{maoxuan}{2020/05/26}{0}{Selected Works of Mao Tse-Tung}
 
 \DeclareOption { source-han }
   { \bool_gset_true:N \g_maoxuan_source_han_bool }
@@ -32,8 +32,8 @@
 \RequirePackage { booktabs , enumitem , titleps }
 \RequirePackage { hyperref }
 \RequirePackage { bookmark }
-\int_zero:N \tex_widowpenalty:D
-\int_zero:N \tex_clubpenalty:D
+\int_set:Nn \tex_clubpenalty:D  { 150 }
+\int_set:Nn \tex_widowpenalty:D { 150 }
 \tl_const:Nn \c_maoxuan_name_tl { 毛泽东选集 }
 \hypersetup
   {
@@ -177,17 +177,15 @@
     \tl_clear:N \l_tmpa_tl
     \int_set:Nn \l_tmpa_int {#1}
     \int_set:Nn \l_tmpb_int {#2}
-    \int_step_inline:nnnn
+    \int_step_inline:nnn
       { \l_tmpa_int }
-      { \c_one }
-      { \int_min:nn { \l_tmpb_int } { \c_nine } }
+      { \int_min:nn { \l_tmpb_int } { 9 } }
       {
         \tl_put_right:Nx \l_tmpa_tl
           { \maoxuan_input_article:n { \l_maoxuan_vol_prefix_tl 0 ##1 } }
       }
-    \int_step_inline:nnnn
-      { \int_max:nn { \l_tmpa_int } { \c_ten } }
-      { \c_one }
+    \int_step_inline:nnn
+      { \int_max:nn { \l_tmpa_int } { 10 } }
       { \l_tmpb_int }
       {
         \tl_put_right:Nx \l_tmpa_tl
@@ -201,7 +199,7 @@
       {
         \clearpage
         \@addtofilelist { \l_maoxuan_current_file_tl }
-        \tex_input:D \l_maoxuan_current_file_tl \c_space_token
+        \tex_input:D { \l_maoxuan_current_file_tl }
         \maoxuan_at_end_article:
         \clearpage
       }
@@ -248,7 +246,7 @@
         aftertitle  = \maoxuan_make_thanks: \par
                       \maoxuan_make_date:n { \normalsize } \par ,
         beforeskip  = 20pt ,
-        afterskip   = 30pt minus 10pt ,
+        afterskip   = 30pt minus 15pt ,
       } ,
     section =
       {
@@ -317,7 +315,7 @@
   { #1 \maoxuan_endline_mark: }
 \cs_new_protected_nopar:Npn \maoxuan_endline_mark:
   { \maoxuan_endline_mark_aux: }
-\cs_new_eq:NN\maoxuan_endline_mark_aux: \prg_do_nothing:
+\cs_new_eq:NN \maoxuan_endline_mark_aux: \prg_do_nothing:
 \cs_new:Npn \maoxuan_article_toc:nn #1#2
   { {#1} {#2} }
 \pdfstringdefDisableCommands
@@ -587,9 +585,8 @@
     \exp_args:NNNx \group_end:
       \str_set:Nn #1 { \maoxuan_sanitize_wrapper:n {#3} }
   }
-\cs_if_exist:NTF \mdfivesum
-  { \cs_new_eq:NN \maoxuan_sanitize_wrapper:n \mdfivesum }
-  { \cs_new_eq:NN \maoxuan_sanitize_wrapper:n \use:n }
+\cs_new_nopar:Npn \maoxuan_sanitize_wrapper:n #1
+  { \pdf@mdfivesum {#1} }
 \RenewDocumentCommand \title { +m }
   {
     \tl_set:Nn \l_maoxuan_title_tl {#1}
